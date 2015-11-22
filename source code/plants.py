@@ -12,6 +12,7 @@ attack_y=0
 
 
 class Plant1:
+
     def __init__(self):
         self.x, self.y = 250, 350
         self.frame = 0
@@ -37,6 +38,7 @@ class Plant1:
         draw_rectangle(*self.get_bb())
 
 class Flower:
+
     def __init__(self):
         self.x, self.y = 250, 450
         self.frame = 0
@@ -55,6 +57,8 @@ class Flower:
         draw_rectangle(*self.get_bb())
 
 class Potato:
+
+
     def __init__(self):
         self.x, self.y = 250, 250
         self.frame = 0
@@ -73,6 +77,7 @@ class Potato:
         draw_rectangle(*self.get_bb())
 
 class Bomb:
+
     def __init__(self):
         self.x, self.y = 250, 150
         self.frame =0
@@ -91,10 +96,19 @@ class Bomb:
         draw_rectangle(*self.get_bb())
 
 class Attack1:
+
+    PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
+    RUN_SPEED_KMPH = 3.0                    # Km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
     def __init__(self):
         self.image = load_image('attack.png')
         self.frame =0
         self.x, self.y = Plant1().x+30, Plant1().y+20
+        self.dir = 1
+        self.total_frames = 0.0
 
     def update(self):
         global isAttack

@@ -24,13 +24,18 @@ class Background:
         self.image.draw(400, 300)
 
 
+#def get_frame_time():
 
+#    global current_time
+
+#    frame_time = get_time() - current_time
+#    current_time += frame_time
+#    return frame_time
 
 def enter():
     global back, attack, plant, flower, enemy, zomby, potato, bomb
     back = Background()
     plant = Plant1()
-    enemy = Enemy1()
     flower = Flower()
     zomby = Zomby()
     attack=Attack1()
@@ -41,7 +46,6 @@ def exit():
     global back, plant, attack, flower, enemy, zomby, potato, bomb
     del(plant)
     del(back)
-    del(enemy)
     del(flower)
     del(zomby)
     del(attack)
@@ -65,6 +69,7 @@ def handle_events():
 
 
 def update():
+#    frame_time = get_frame_time()
     global isAttack
     plant.update()
     flower.update()
@@ -78,7 +83,6 @@ def draw():
     clear_canvas()
     back.draw()
     plant.draw()
-    #enemy.draw()
     flower.draw()
     zomby.draw()
     potato.draw()
@@ -106,6 +110,7 @@ def collide(a,b):
     if(bottom_a > top_b):return False
 
     return True
+
 
 
 
