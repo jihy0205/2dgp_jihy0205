@@ -12,7 +12,6 @@ from zombies import *
 name = "MainState"
 
 back = None
-<<<<<<< HEAD
 # 생성여부변수
 plant_ = False
 flower_ = False
@@ -28,10 +27,6 @@ bombs = None
 matrix = [[0 for col in range(5)] for row in range(7)]
 
 gameover_image = None
-=======
-isAttack = True
-
->>>>>>> origin/master
 
 class Background:
     def __init__(self):
@@ -41,26 +36,10 @@ class Background:
     def draw(self):
         self.image.draw(400, 300)
 
-<<<<<<< HEAD
-=======
-
-#def get_frame_time():
-
-#    global current_time
-
-#    frame_time = get_time() - current_time
-#    current_time += frame_time
-#    return frame_time
-
->>>>>>> origin/master
 def enter():
     global back, attack, plant, flower, enemy, zomby, potato, bomb
     global unit_1, unit_2, unit_3, unit_4
     back = Background()
-<<<<<<< HEAD
-=======
-    plant = Plant1()
->>>>>>> origin/master
     flower = Flower()
     plant = Plant1()
     zomby = Zomby()
@@ -91,13 +70,11 @@ def resume():
     pass
 
 def handle_events(frame_time):
-    global isAttack
     global back, attack, plant, flower, enemy, zomby, potato, bomb
     global plant_, flower_, potato_, bomb_
 
     events = get_events()
     for event in events:
-<<<<<<< HEAD
         if (event.type, event.key) ==(SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.change_state(title_state)
         elif event.type ==SDL_KEYDOWN:
@@ -124,27 +101,19 @@ def handle_events(frame_time):
                 attack.x, attack.y = plant.x, plant.y+20
 
 def update(frame_time):
-=======
-        if event.type ==SDL_QUIT:
-            game_framework.quit()
-
-
-def update():
-#    frame_time = get_frame_time()
->>>>>>> origin/master
-    global isAttack
+    b_left, b_bottom, b_right, b_top = bomb.explosion_bb()
     if plant_ == True:
         plant.update(frame_time)
-        attack.update(frame_time)
+        attack.show = True
+        attack.update(frame_time, plant.x)
     if flower_ == True:
         flower.update(frame_time)
-
     if potato_ == True:
         potato.update(frame_time)
     if bomb_ == True:
         bomb.update(frame_time)
     for zomby in enemy:
-        zomby.update()
+        zomby.update(frame_time)
 
     #충돌체크
     for zomby in enemy:
@@ -168,18 +137,19 @@ def update():
                 potato.hp -= zomby.atk
         if bomb_ == True:
             if collide(bomb, zomby): # 범위 내에 있는 좀비 사망
-                pass
+                for zomby in enemy:
+                    if explosion(bomb, zomby):
+                        enemy.remove(zomby)
 
 
 def draw(frame_time):
     global isAttack
     clear_canvas()
     back.draw()
-<<<<<<< HEAD
     if plant_ == True:
         plant.draw(frame_time)
         plant.draw_bb()
-        attack.draw(frame_time)
+        attack.draw()
         attack.draw_bb()
     if flower_ == True:
         flower.draw(frame_time)
@@ -190,29 +160,22 @@ def draw(frame_time):
     if bomb_ == True:
         bomb.draw(frame_time)
         bomb.draw_bb()
-
     for zomby in enemy:
-        zomby.draw()
+        zomby.draw(frame_time)
         zomby.draw_bb()
-=======
-    plant.draw()
-    flower.draw()
-    zomby.draw()
-    potato.draw()
-    bomb.draw()
-    if(isAttack == True):
-        attack.draw()
-        attack.draw_bb()
-
-    #충돌박스 그리기
-    plant.draw_bb()
-    flower.draw_bb()
-    potato.draw_bb()
-    bomb.draw_bb()
-
->>>>>>> origin/master
     update_canvas()
     delay(0.07)
+
+def explosion(a, b):
+    left_a, bottom_a, right_a, top_a = a.explosion_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if(left_a > right_b):return False
+    if(right_a < left_b):return False
+    if(top_a < bottom_b):return False
+    if(bottom_a > top_b):return False
+
+    return True
 
 def collide(a,b):
     left_a, bottom_a, right_a, top_a = a.get_bb()
