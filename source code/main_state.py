@@ -7,6 +7,7 @@ import game_framework
 import title_state
 from plants import *
 from zombies import *
+from sun import *
 
 
 name = "MainState"
@@ -20,7 +21,6 @@ bomb_ = False
 #
 plants = None
 flowers = None
-zombies = None
 potatoes = None
 bombs = None
 
@@ -37,14 +37,13 @@ class Background:
         self.image.draw(400, 300)
 
 def enter():
-    global back, attack, plant, flower, enemy, zomby, potato, bomb
+    global back, attack, plant, flower, enemy, potato, bomb
     global unit_1, unit_2, unit_3, unit_4
     back = Background()
     flower = Flower()
     plant = Plant1()
-    zomby = Zomby()
     enemy = [Zomby() for i in range(6)]
-    attack=Attack()
+    attack = Attack()
     potato = Potato()
     bomb = Bomb()
     unit_1 = []
@@ -53,11 +52,11 @@ def enter():
     unit_4 = []
 
 def exit():
-    global back, plant, attack, flower, enemy, zomby, potato, bomb
+    global back, plant, attack, flower, enemy, potato, bomb
     del(plant)
     del(back)
     del(flower)
-    del(zomby)
+    del(enemy)
     del(attack)
     del(potato)
     del(bomb)
@@ -70,7 +69,7 @@ def resume():
     pass
 
 def handle_events(frame_time):
-    global back, attack, plant, flower, enemy, zomby, potato, bomb
+    global back, attack, plant, flower, enemy, potato, bomb
     global plant_, flower_, potato_, bomb_
 
     events = get_events()
@@ -101,7 +100,6 @@ def handle_events(frame_time):
                 attack.x, attack.y = plant.x, plant.y+20
 
 def update(frame_time):
-    b_left, b_bottom, b_right, b_top = bomb.explosion_bb()
     if plant_ == True:
         plant.update(frame_time)
         attack.show = True
@@ -139,11 +137,11 @@ def update(frame_time):
             if collide(bomb, zomby): # 범위 내에 있는 좀비 사망
                 for zomby in enemy:
                     if explosion(bomb, zomby):
+                        zomby.state = zomby.DIE
                         enemy.remove(zomby)
 
 
 def draw(frame_time):
-    global isAttack
     clear_canvas()
     back.draw()
     if plant_ == True:

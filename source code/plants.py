@@ -34,7 +34,7 @@ class Plant1:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
 
-        self.frame = (self.frame + 1) % 8
+        self.frame = int(self.total_frames + 1) % 8
         print("plant: %f" % (self.total_frames))
 
     def draw(self, frame_time):
@@ -57,9 +57,13 @@ class Flower:
         self.frame = 0
         self.hp=50
         self.image = load_image('flower.png')
+        self.life_time = 0.0
+        self.total_frames = 0.0
 
     def update(self, frame_time):
-        self.frame = (self.frame + 1)% 8
+        self.life_time += frame_time
+        self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames + 1)% 8
         print("flower: %f" %(frame_time))
 
     def draw(self, frame_time):
@@ -82,9 +86,13 @@ class Potato:
         self.frame = 0
         self.hp=200
         self.image = load_image('potato.png')
+        self.life_time = 0.0
+        self.total_frames = 0.0
 
     def update(self, frame_time):
-        self.frame = (self.frame + 1)% 4
+        self.life_time += frame_time
+        self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames + 1)% 4
         print("Potato: %f" %(frame_time))
 
     def draw(self, frame_time):
@@ -110,9 +118,13 @@ class Bomb:
         self.bottom = self.y - 150
         self.right = self.x + 150
         self.top = self.y + 150
+        self.life_time = 0.0
+        self.total_frames = 0.0
 
     def update(self, frame_time):
-        self.frame = (self.frame + 1) % 4
+        self.life_time += frame_time
+        self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames+ 1) % 4
         print("bomb: %f" % (frame_time))
 
     def explosion_bb(self):

@@ -7,6 +7,7 @@ class Sun:
     RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
     TIME_PER_ACTION = 0.5
     ACTION_PER_TIME = 0.5 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
@@ -15,12 +16,20 @@ class Sun:
 
     def __init__(self):
         self.image = load_image('sun.png')
-        pass
+        self.y = 0
+        self.x = random.randint(150, 450)
+        self.frame = 0.0
+        self.dir = -1
+        self.total_frames = 0.0
+
     def update(self):
         pass
+
     def draw(self):
-        pass
+        self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
+
     def get_bb(self):
-        pass
+        return self.x - 20, self.y-20, self.x+20, self.y-20
+
     def draw_bb(self):
-        pass
+        draw_rectangle(*self.get_bb())
