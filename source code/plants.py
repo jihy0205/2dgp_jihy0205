@@ -7,6 +7,7 @@ attack1 = None
 isAttack = True
 dist = 0
 count = 0
+life_time = 0.0
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 0.5 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 6
@@ -21,7 +22,6 @@ class Plant1:
         self.x, self.y = 0, 0
         self.frame = 0
         self.image = load_image('plant1.png')
-        self.count =0
         self.hp=50
         self.isTrue = False
         self.life_time = 0.0
@@ -31,11 +31,9 @@ class Plant1:
         pass
 
     def update(self, frame_time):
-        self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
 
         self.frame = int(self.total_frames + 1) % 8
-        print("plant: %f" % (self.total_frames))
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame * 100, 0, 100, 100, self.x, self.y)
@@ -64,7 +62,7 @@ class Flower:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames + 1)% 8
-        print("flower: %f" %(frame_time))
+        print("flower: ", self.hp)
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
@@ -93,7 +91,7 @@ class Potato:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames + 1)% 4
-        print("Potato: %f" %(frame_time))
+        print("Potato: ", self.hp)
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
@@ -125,7 +123,6 @@ class Bomb:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames+ 1) % 4
-        print("bomb: %f" % (frame_time))
 
     def explosion_bb(self):
         return self.left, self.bottom, self.right, self.top
@@ -153,12 +150,11 @@ class Attack:
         self.x, self.y = self.initX, self.initY
         self.dir = 1
         self.atk = 10
-        self.show = False
-        self.life_time = 0.0
+        self.show = True
         self.total_frames = 0.0
 
     def update(self, frame_time, plant_x):
-        self.life_time += frame_time
+        global life_time
         distance = Attack.RUN_SPEED_PPS * frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
 
@@ -167,6 +163,12 @@ class Attack:
                 self.x += distance
             else:
                 self.x = plant_x+10
+                self.show = False
+        else:
+            life_time += frame_time
+            if life_time >= 1.5:
+                life_time = 0.0
+                self.show = True
 
     def showCheck(self, show):
         self.show = show

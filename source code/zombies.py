@@ -2,6 +2,7 @@ from pico2d import *
 import random
 
 zomby = None
+attack_time = 0.0
 
 class Zomby:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
@@ -29,10 +30,15 @@ class Zomby:
         self.state = self.WALK
         self.atk = 10
         self.hp = 50
-        self.life_time = 0.0
         self.total_frames = 0.0
+        self.show = False
+        self.attack = True
+
+    def newCreateZomby(self):
+        pass
 
     def update(self, frame_time):
+        global attack_time
         distance = Zomby.RUN_SPEED_PPS * frame_time
         self.total_frames += Zomby.FRAMES_PER_ACTION * Zomby.ACTION_PER_TIME * frame_time
         self.walk_frame = int(self.total_frames) % 8
@@ -41,6 +47,11 @@ class Zomby:
         if(self.state == self.WALK):
             if(self.x >= 30):
                 self.x -= distance
+        if self.attack == False:
+            attack_time += frame_time
+            if int(attack_time) == 1:
+                attack_time = 0.0
+                self.attack = True
 
     def draw(self, frame_time):
         if self.state == self.WALK:

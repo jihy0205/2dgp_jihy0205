@@ -1,5 +1,6 @@
 from pico2d import *
 import random
+import game_framework
 
 class Sun:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
@@ -16,14 +17,25 @@ class Sun:
 
     def __init__(self):
         self.image = load_image('sun.png')
-        self.y = 0
+        self.font = load_font('ConsolaMangun.ttf', 10)
         self.x = random.randint(150, 450)
+        self.y = 0
         self.frame = 0.0
         self.dir = -1
         self.total_frames = 0.0
+        self.score = 0
+        self.money = 0
 
-    def update(self):
-        pass
+    def update(self, frame_time):
+        distance = Sun.RUN_SPEED_PPS * frame_time
+        self.total_frames += Sun.FRAMES_PER_ACTION * Sun.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames) % 2
+
+        if(self.y <= 0):
+            self.y -= distance
+
+    def getMoney(self):
+        return self.money
 
     def draw(self):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
