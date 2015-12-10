@@ -34,8 +34,8 @@ class Plant1:
         self.createX = int(mouse_x / 100)
         self.createY = int(mouse_y / 100)
 
-        self.initX = self.createX * 100 + 50
-        self.initY = self.createY * 100 + 50
+        self.x = self.createX * 100 + 50
+        self.y = self.createY * 100 + 50
 
     def returnHP(self):
         if self.hp != 0:
@@ -63,12 +63,19 @@ class Flower:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
     def __init__(self):
-        self.x, self.y = 250, 450
+        self.x, self.y = 0, 0
         self.frame = 0
         self.hp=50
         self.image = load_image('flower.png')
         self.life_time = 0.0
         self.total_frames = 0.0
+
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.x = self.createX * 100 + 50
+        self.y = self.createY * 100 + 50
 
     def returnHP(self):
         if self.hp != 0:
@@ -97,12 +104,19 @@ class Potato:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
     def __init__(self):
-        self.x, self.y = 250, 350
+        self.x, self.y = 0, 0
         self.frame = 0
         self.hp=200
         self.image = load_image('potato.png')
         self.life_time = 0.0
         self.total_frames = 0.0
+
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.x = self.createX * 100 + 50
+        self.y = self.createY * 100 + 50
 
     def returnHP(self):
         if self.hp != 0:
@@ -131,8 +145,8 @@ class Bomb:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
     def __init__(self):
-        self.x, self.y = 250, 150
-        self.frame =0
+        self.x, self.y = 0, 0
+        self.frame = 0
         self.image = load_image('bomb.png')
         self.left = self.x - 180
         self.bottom = self.y - 170
@@ -141,13 +155,20 @@ class Bomb:
         self.life_time = 0.0
         self.total_frames = 0.0
 
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.x = self.createX * 100 + 50
+        self.y = self.createY * 100 + 50
+
     def update(self, frame_time):
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames+ 1) % 4
 
     def explosion_bb(self):
-        return self.left, self.bottom, self.right, self.top
+        return self.x - 180, self.y - 180, self.x + 180, self.y + 180
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
@@ -166,23 +187,16 @@ class Attack:
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
     def __init__(self):
         self.image = load_image('attack.png')
-        self.frame =0
+        self.frame = 0
         self.initX = 0
         self.initY = 0
-        self.x, self.y = self.initX + 10, self.initY + 20
+        self.x, self.y = self.initX + 20, self.initY + 10
         self.dir = 1
         self.atk = 10
         self.show = True
         self.total_frames = 0.0
 
-    def newSet(self, mouse_x, mouse_y):
-        createX = int(mouse_x / 100)
-        createY = int(mouse_y / 100)
-
-        self.initX = createX * 100 + 50
-        self.initY = createY * 100 + 50
-
-    def update(self, frame_time, plant_x):
+    def update(self, frame_time):
         global life_time
         distance = Attack.RUN_SPEED_PPS * frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
@@ -191,7 +205,8 @@ class Attack:
             if(self.x < 700):
                 self.x += distance
             else:
-                self.x = plant_x+10
+                self.x = self.initX + 20
+                self.y = self.initY + 10
                 self.show = False
         else:
             life_time += frame_time
@@ -201,6 +216,15 @@ class Attack:
 
     def showCheck(self, show):
         self.show = show
+
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.initX = self.createX * 100 + 50
+        self.initY = self.createY * 100 + 50
+        self.x = self.initX + 20
+        self.y = self.initY + 10
 
     def draw(self):
         self.image.draw(self.x, self.y)

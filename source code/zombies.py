@@ -69,7 +69,7 @@ class Zomby:
                 self.die_frame = 2
 
     def get_bb(self):
-        return self.x-40, self.y-50, self.x+40, self.y+50
+        return self.x-20, self.y-50, self.x+20, self.y+50
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())

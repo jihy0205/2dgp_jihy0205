@@ -25,20 +25,14 @@ potatoes = None
 bombs = None
 sun = None
 
-plants_index = 0
-missiles_index = 0
-flowers_index = 0
-sun_collection_index = 0
-potatoes_index = 0
-bombs_index = 0
-enemy_index = 0
 tool_num = 0
 mouse_x, mouse_y = 0, 0
 gold = 0
-matrix = [[0 for col in range(5)] for row in range(7)]
+matrix = [[0 for col in range(6)] for row in range(8)]
 sun_time = 0.0
 zomby_time = 0.0
 hp_time = 0.0
+idx_x, idx_y = 0, 0
 gameover_image = None
 
 class Background:
@@ -83,26 +77,67 @@ def pause():
 def resume():
     pass
 
-def click():
+def clickArea():
     global plants, flowers, potatoes, bombs, missiles, sun_collection
-    global plants_index, flowers_index, potatoes_index, bombs_index, missiles_index, sun_collection_index
     global plant_, flower_, potato_, bomb_
-    global gold, tool_num
+    global gold, tool_num, idx_x, idx_y
     global mouse_x, mouse_y
+    global matrix
     # 땅 영역
     if 0 < mouse_x < 800 and 90 < mouse_y < 600:
+        idx_x = int(mouse_x / 100)
+        idx_y = int(mouse_y / 100)
         if tool_num == 1: # 좌표 설정, 배열값 설정
+            if matrix[idx_y][idx_x] == 0:
+                new_plant1 = Plant1()
+                new_plant1.newSet(mouse_x, 599 - mouse_y)
+                plants.append(new_plant1)
 
-            plants.append(Plant1())
-            Plant1().newSet(mouse_x, mouse_y)
-            plants_index += 1
-            plant_ = True
+                new_missile = Attack()
+                new_missile.newSet(mouse_x, 599 - mouse_y)
+                missiles.append(new_missile)
+                plant_ = True
+                matrix[idx_y][idx_x] = 1
+                tool_num = 0
+            else:
+                return False
 
-            missile = Attack()
-            missile.x = Plant1().x + 20
-            missile.y = Plant1().y + 10
-            missiles.append(missile)
-            missiles_index += 1
+        elif tool_num == 2:
+            if matrix[idx_y][idx_x] == 0:
+                new_flower = Flower()
+                new_flower.newSet(mouse_x, 599 - mouse_y)
+                flowers.append(new_flower)
+                flower_ = True
+                matrix[idx_y][idx_x] = 1
+                tool_num = 0
+            else:
+                return False
+
+        elif tool_num == 3:
+            if matrix[idx_y][idx_x] == 0:
+                new_potato = Potato()
+                new_potato.newSet(mouse_x, 599 - mouse_y)
+                potatoes.append(new_potato)
+                potato_ = True
+                matrix[idx_y][idx_x] = 1
+                tool_num = 0
+            else:
+                return False
+
+        elif tool_num == 4:
+            if matrix[idx_y][idx_x] == 0:
+                new_bomb = Bomb()
+                new_bomb.newSet(mouse_x, 599 - mouse_y)
+                bombs.append(new_bomb)
+                bomb_ = True
+                matrix[idx_x][idx_y] = 1
+                tool_num = 0
+            else:
+                return False
+
+        #삭제
+        elif tool_num == 5:
+            pass
 
     #UI 영역
     else:
@@ -121,11 +156,7 @@ def click():
     print('x, y: ', mouse_x, mouse_y)
     print('tool: ', tool_num)
 
-
 def handle_events(frame_time):
-    global back, attack, plant, flower, enemy, potato, bomb
-    global plants, flowers, potatoes, bombs, missiles, sun_collection
-    global plants_index, flowers_index, potatoes_index, bombs_index, missiles_index, sun_collection_index
     global plant_, flower_, potato_, bomb_
     global mouse_x, mouse_y
 
@@ -139,30 +170,10 @@ def handle_events(frame_time):
             potato_ = False
             bomb_ = False
             game_framework.change_state(title_state)
-        elif event.type ==SDL_KEYDOWN:
-            if event.key == SDLK_1:
-                plants.append(Plant1())
-                plants_index += 1
-                plant_ = True
-                missiles.append(Attack())
-                missiles_index += 1
-            if event.key == SDLK_2:
-                flowers.append(Flower())
-                flowers_index += 1
-                flower_ = True
-            if event.key == SDLK_3:
-                potatoes.append(Potato())
-                potatoes_index += 1
-                potato_ = True
-            if event.key == SDLK_4:
-                bombs.append(Bomb())
-                bombs_index += 1
-                bomb_ = True
-
         elif event.type == SDL_MOUSEMOTION:
             mouse_x, mouse_y = event.x, event.y
         elif (event.type, event.button) == (SDL_MOUSEBUTTONDOWN, SDL_BUTTON_LEFT):
-            click()
+            clickArea()
 
 def update(frame_time):
     global back, hp_time
@@ -171,8 +182,8 @@ def update(frame_time):
         if plant_ == True:
             for plant in plants:
                 plant.update(frame_time)
-                for attack in missiles:
-                    attack.update(frame_time, plant.x)
+            for attack in missiles:
+                attack.update(frame_time)
 
         if flower_ == True:
             for flower in flowers:
@@ -192,9 +203,9 @@ def update(frame_time):
                 back.get_start = False
 
     #충돌체크
-        for zomby in enemy:
-            if plant_ == True:
-                for plant in plants:
+        if plant_ == True:
+            for plant in plants:
+                for zomby in enemy:
                     if collide(zomby, plant):
                         zomby.state = zomby.ATTACK
                         if zomby.attack == True:
@@ -202,21 +213,27 @@ def update(frame_time):
                                 plant.hp -= zomby.atk
                                 zomby.attack = False
                             else:
+                                zomby.state = zomby.WALK
+                                idx = plants.index(plant)
                                 plants.remove(plant)
+                                del missiles[idx]
                     else:
                         zomby.state = zomby.WALK
 
-                    for attack in missiles:
+                for attack in missiles:
+                    for zomby in enemy:
                         if collide(attack, zomby):
                             attack.show = False
-                            attack.x = plant.x+10
+                            attack.x = attack.initX
+                            attack.y = attack.initY
                             zomby.hp -= attack.atk
                             if zomby.returnHP() == True:
                                 zomby.state = zomby.DIE
                                 enemy.remove(zomby)
 
-            if flower_ == True:
-                for flower in flowers:
+        if flower_ == True:
+            for flower in flowers:
+                for zomby in enemy:
                     if collide(flower, zomby):
                         zomby.state = zomby.ATTACK
                         if zomby.attack == True:
@@ -224,12 +241,14 @@ def update(frame_time):
                                 flower.hp -= zomby.atk
                                 zomby.attack = False
                             else:
+                                zomby.state = zomby.WALK
                                 flowers.remove(flower)
                     else:
                         zomby.state = zomby.WALK
 
-            if potato_ == True:
-                for potato in potatoes:
+        if potato_ == True:
+            for potato in potatoes:
+                for zomby in enemy:
                     if collide(potato, zomby):
                         zomby.state = zomby.ATTACK
                         if zomby.attack == True:
@@ -237,14 +256,18 @@ def update(frame_time):
                                 potato.hp -= zomby.atk
                                 zomby.attack = False
                             else:
+                                zomby.state = zomby.WALK
                                 potatoes.remove(potato)
+                    else:
+                        zomby.state = zomby.WALK
 
-            if bomb_ == True:
+        if bomb_ == True:
+            for zomby in enemy:
                 for bomb in bombs:
                     if collide(bomb, zomby): # 범위 내에 있는 좀비 사망
+                        enemy.remove(zomby)
                         for zomby in enemy:
                             if explosion(bomb, zomby):
-                                zomby.state = zomby.DIE
                                 enemy.remove(zomby)
                         bombs.remove(bomb)
 
