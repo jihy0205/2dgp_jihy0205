@@ -19,16 +19,28 @@ class Plant1:
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
     def __init__(self):
-        self.x, self.y = 0, 0
+        self.x = 0
+        self.y = 0
         self.frame = 0
         self.image = load_image('plant1.png')
-        self.hp=50
+        self.hp = 50
         self.isTrue = False
         self.life_time = 0.0
         self.total_frames = 0.0
+        self.createX = 0
+        self.createY = 0
 
-    def newCreatePlant(self):
-        pass
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.initX = self.createX * 100 + 50
+        self.initY = self.createY * 100 + 50
+
+    def returnHP(self):
+        if self.hp != 0:
+            return False
+        return True
 
     def update(self, frame_time):
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
@@ -57,6 +69,11 @@ class Flower:
         self.image = load_image('flower.png')
         self.life_time = 0.0
         self.total_frames = 0.0
+
+    def returnHP(self):
+        if self.hp != 0:
+            return False
+        return True
 
     def update(self, frame_time):
         self.life_time += frame_time
@@ -87,6 +104,11 @@ class Potato:
         self.life_time = 0.0
         self.total_frames = 0.0
 
+    def returnHP(self):
+        if self.hp != 0:
+            return False
+        return True
+
     def update(self, frame_time):
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
@@ -112,10 +134,10 @@ class Bomb:
         self.x, self.y = 250, 150
         self.frame =0
         self.image = load_image('bomb.png')
-        self.left = self.x - 150
-        self.bottom = self.y - 150
-        self.right = self.x + 150
-        self.top = self.y + 150
+        self.left = self.x - 180
+        self.bottom = self.y - 170
+        self.right = self.x + 180
+        self.top = self.y + 170
         self.life_time = 0.0
         self.total_frames = 0.0
 
@@ -145,13 +167,20 @@ class Attack:
     def __init__(self):
         self.image = load_image('attack.png')
         self.frame =0
-        self.initX = Plant1().x+10
-        self.initY = Plant1().y+20
-        self.x, self.y = self.initX, self.initY
+        self.initX = 0
+        self.initY = 0
+        self.x, self.y = self.initX + 10, self.initY + 20
         self.dir = 1
         self.atk = 10
         self.show = True
         self.total_frames = 0.0
+
+    def newSet(self, mouse_x, mouse_y):
+        createX = int(mouse_x / 100)
+        createY = int(mouse_y / 100)
+
+        self.initX = createX * 100 + 50
+        self.initY = createY * 100 + 50
 
     def update(self, frame_time, plant_x):
         global life_time

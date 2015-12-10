@@ -22,9 +22,7 @@ class Sun:
         self.y = 0
         self.frame = 0.0
         self.dir = -1
-        self.total_frames = 0.0
-        self.score = 0
-        self.money = 0
+        self.total_frames = 0
 
     def update(self, frame_time):
         distance = Sun.RUN_SPEED_PPS * frame_time

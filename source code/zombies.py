@@ -53,6 +53,11 @@ class Zomby:
                 attack_time = 0.0
                 self.attack = True
 
+    def returnHP(self):
+        if self.hp != 0:
+            return False
+        return True
+
     def draw(self, frame_time):
         if self.state == self.WALK:
             self.walk_image.clip_draw(self.walk_frame*150, 0, 150, 150, self.x, self.y)
