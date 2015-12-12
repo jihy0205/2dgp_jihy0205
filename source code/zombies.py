@@ -1,10 +1,10 @@
 from pico2d import *
 import random
 
-zomby = None
 attack_time = 0.0
+show_time = 0.0
 
-class Zomby:
+class Zombie:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
     TIME_PER_ACTION = 0.5
     ACTION_PER_TIME = 0.5 / TIME_PER_ACTION
@@ -34,24 +34,30 @@ class Zomby:
         self.show = False
         self.attack = True
 
-    def newCreateZomby(self):
-        pass
-
     def update(self, frame_time):
-        global attack_time
-        distance = Zomby.RUN_SPEED_PPS * frame_time
-        self.total_frames += Zomby.FRAMES_PER_ACTION * Zomby.ACTION_PER_TIME * frame_time
+        global attack_time, show_time
+        distance = Zombie.RUN_SPEED_PPS * frame_time
+        self.total_frames += Zombie.FRAMES_PER_ACTION * Zombie.ACTION_PER_TIME * frame_time
         self.walk_frame = int(self.total_frames) % 8
         self.eat_frame = int(self.total_frames) % 5
         self.die_frame = int(self.total_frames) % 8
+
         if(self.state == self.WALK):
             if(self.x >= 30):
                 self.x -= distance
+
         if self.attack == False:
             attack_time += frame_time
             if int(attack_time) == 1:
                 attack_time = 0.0
                 self.attack = True
+
+        if self.show == False:
+            show_time += frame_time
+            randtime = random.randint(4, 7)
+            if int(show_time) == randtime:
+                show_time = 0.0
+                self.show = True
 
     def returnHP(self):
         if self.hp != 0:

@@ -4,7 +4,7 @@ import game_framework
 
 class Sun:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
-    RUN_SPEED_KMPH = 3.0                    # Km / Hour
+    RUN_SPEED_KMPH = 2.0                    # Km / Hour
     RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
     RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
     RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -17,9 +17,8 @@ class Sun:
 
     def __init__(self):
         self.image = load_image('sun.png')
-        self.font = load_font('ConsolaMangun.ttf', 10)
-        self.x = random.randint(150, 450)
-        self.y = 0
+        self.x = random.randint(150, 600)
+        self.y = 600
         self.frame = 0.0
         self.dir = -1
         self.total_frames = 0
@@ -29,17 +28,14 @@ class Sun:
         self.total_frames += Sun.FRAMES_PER_ACTION * Sun.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames) % 2
 
-        if(self.y <= 0):
+        if(self.y >= 50):
             self.y -= distance
-
-    def getMoney(self):
-        return self.money
 
     def draw(self):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
 
     def get_bb(self):
-        return self.x - 20, self.y-20, self.x+20, self.y-20
+        return self.x - 20, self.y - 20, self.x + 20, self.y + 20
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())

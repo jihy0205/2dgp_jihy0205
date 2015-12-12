@@ -65,7 +65,7 @@ class Flower:
     def __init__(self):
         self.x, self.y = 0, 0
         self.frame = 0
-        self.hp=50
+        self.hp = 50
         self.image = load_image('flower.png')
         self.life_time = 0.0
         self.total_frames = 0.0
@@ -79,8 +79,8 @@ class Flower:
 
     def returnHP(self):
         if self.hp != 0:
-            return False
-        return True
+            return True
+        return False
 
     def update(self, frame_time):
         self.life_time += frame_time
@@ -96,6 +96,52 @@ class Flower:
 
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
+
+class FlowerSun:
+    PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
+    RUN_SPEED_KMPH = 2.0                    # Km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    def __init__(self):
+        self.initX = 0
+        self.initY = 0
+        self.x, self.y = self.initX, self.initY
+        self.image = load_image('sun.png')
+        self.frame = 0
+        self.total_frames = 0.0
+        self.life_time = 0.0
+        self.show = False
+
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.initX = self.createX * 100 + 50
+        self.initY = self.createY * 100 + 50
+        self.x = self.initX
+        self.y = self.initY
+
+    def update(self, frame_time):
+        self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frames) % 2
+
+        if self.show == True:
+            self.x = self.initX
+            self.y = self.initY
+        else:
+            self.life_time += frame_time
+            if self.life_time >= 5:
+                self.life_time = 0.0
+                self.show = True
+
+    def draw(self):
+        self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
+
+    def get_bb(self):
+        return self.x - 20, self.y-20, self.x + 20, self.y + 20
+
 
 class Potato:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
@@ -168,7 +214,7 @@ class Bomb:
         self.frame = int(self.total_frames+ 1) % 4
 
     def explosion_bb(self):
-        return self.x - 180, self.y - 180, self.x + 180, self.y + 180
+        return self.x - 180, self.y - 150, self.x + 180, self.y + 150
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
@@ -177,7 +223,7 @@ class Bomb:
         return self.x-20, self.y-20, self.x+20, self.y+20
 
     def draw_bb(self):
-        draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.explosion_bb())
 
 class Attack:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
