@@ -6,7 +6,6 @@ import time
 from pico2d import *
 import game_framework
 import title_state
-import stage2
 from plants import *
 from zombies import *
 from sun import *
@@ -20,17 +19,18 @@ flower_ = False
 potato_ = False
 bomb_ = False
 
+plants2 = None
 plants = None
 flowers = None
 potatoes = None
 bombs = None
 
-clear_count = 2
+clear_count = 20
 dead_count = 0
 zombie_count = 1
 tool_num = 0
 mouse_x, mouse_y = 0, 0
-gold = 100000
+gold = 10000
 matrix = [[0 for col in range(8)] for row in range(8)]
 sun_time = 0.0
 clear_time = 0.0
@@ -40,6 +40,7 @@ sun_start = 0.0
 sun_end = 0.0
 hp_time = 0.0
 idx_x, idx_y = 0, 0
+sun_x, sun_y = 0, 0
 gameover_image = None
 clear_image = None
 
@@ -47,7 +48,7 @@ clear_image = None
 
 class Background:
     def __init__(self):
-        self.image = load_image('background.png')
+        self.image = load_image('stage2back.png')
         self.gameover_image = load_image('over.png')
         self.clear_image = load_image('clear.png')
         self.get_start = True
@@ -66,11 +67,12 @@ class Background:
 
 def enter():
     global back, attack, plant, flower, enemy, potato, bomb, sun
-    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun, sun_area
+    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun, sun_area, plants2
     global zombie_start, sun_start
     back = Background()
     enemy = [Zombie()]
     plants = []
+    plants2 = []
     missiles = []
     flowers = []
     sun_list = []
@@ -83,11 +85,28 @@ def enter():
     sun_start = time.time()
 
 def exit():
-    global back, plants, flowers, potatoes, bombs, missiles, sun_list, enemy, flower_sun, sun_area
+    global back, plants, flowers, potatoes, bombs, missiles, sun_list, enemy, flower_sun, sun_area, plants2
     global plant_, flower_, potato_, bomb_
+    global dead_count, zombie_count, tool_num, mouse_x, mouse_y, gold, matrix, sun_time, clear_time, zombie_start, zombie_end
+    global sun_start, sun_end, hp_time, idx_x, idx_y
+    dead_count = 0
+    zombie_count = 1
+    tool_num = 0
+    mouse_x, mouse_y = 0, 0
+    gold = 10000
+    matrix = [[0 for col in range(8)] for row in range(8)]
+    sun_time = 0.0
+    clear_time = 0.0
+    zombie_start = 0.0
+    zombie_end = 0.0
+    sun_start = 0.0
+    sun_end = 0.0
+    hp_time = 0.0
+    idx_x, idx_y = 0, 0
     del(back)
     del(enemy)
     del(plants)
+    del(plants2)
     del(flowers)
     del(potatoes)
     del(bombs)
@@ -103,7 +122,7 @@ def resume():
     pass
 
 def clickArea():
-    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun
+    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun, plants2
     global plant_, flower_, potato_, bomb_
     global gold, tool_num, idx_x, idx_y
     global mouse_x, mouse_y
@@ -167,14 +186,21 @@ def clickArea():
                     new_bomb.newSet(mouse_x, 599 - mouse_y)
                     bombs.append(new_bomb)
                     bomb_ = True
-                    matrix[idx_x][idx_y] = 1
+                    matrix[idx_y][idx_x] = 1
                     tool_num = 0
                 else:
                     return False
 
-        #삭제
         elif tool_num == 5:
-            pass
+            if gold >= 175:
+                if matrix[idx_y][idx_x] == 0:
+                    new_plant2 = Plant2()
+                    new_plant2.newSet(mouse_x, 599 - mouse_y)
+                    plants2.append(new_plant2)
+                    matrix[idx_y][idx_x] = 1
+                    tool_num = 0
+                else:
+                    return False
 
     #UI 영역
     else:
@@ -186,7 +212,7 @@ def clickArea():
             tool_num = 3
         elif 280 < mouse_x < 340 and 0 < mouse_y < 80:
             tool_num = 4
-        elif 500 < mouse_x < 580 and 0 < mouse_y < 85:
+        elif 340 < mouse_x < 420 and 0 < mouse_y < 80:
             tool_num = 5
 
         else: tool_num = 0
@@ -195,11 +221,11 @@ def clickArea():
     print('tool: ', tool_num)
 
 def clickSun():
-    global sun_list, gold
-    global mouse_x, mouse_y
+    global sun_list, gold, flower_sun
+    global mouse_x, mouse_y, sun_x, sun_y
     for sun in sun_list:
         left, bottom, right, top = sun.get_bb()
-        if left < mouse_x < right and bottom < mouse_y < top:
+        if left < mouse_x < right and bottom < (599 - mouse_y) < top:
             sun_list.remove(sun)
             gold += 25
 
@@ -241,8 +267,8 @@ def newCreate():
         sun_start = time.time()
 
 def update(frame_time):
-    global back, hp_time, zombie_count, clear_count, dead_count, clear_time
-    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun
+    global back, hp_time, zombie_count, clear_count, dead_count, clear_time, sun_x, sun_y, gold
+    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun, plants2
     if back.get_start == True:
         newCreate()
 
@@ -257,6 +283,10 @@ def update(frame_time):
                 flower.update(frame_time)
             for f_sun in flower_sun:
                 f_sun.update(frame_time)
+                if f_sun.show == True:
+                    gold += 1
+                else:
+                    gold += 0
 
         if potato_ == True:
             for potato in potatoes:
@@ -302,8 +332,6 @@ def update(frame_time):
                                 dead_count += 1
                                 enemy.remove(zombie)
 
-
-
         for flower in flowers:
             for zombie in enemy:
                 if collide(flower, zombie):
@@ -348,26 +376,23 @@ def update(frame_time):
             if clear_time >= 1.5:
                 back.get_clear = False
                 clear_time = 0.0
-                game_framework.change_state(stage2)
+                game_framework.change_state(title_state)
 
 def draw(frame_time):
-    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun
+    global plants, flowers, potatoes, bombs, missiles, sun_list, flower_sun, plants2
     global plant_, flower_, potato_, bomb_
     clear_canvas()
     back.draw()
     if plant_ == True:
         for plant in plants:
             plant.draw(frame_time)
-            plant.draw_bb()
         for attack in missiles:
             if attack.show == True:
                 attack.draw()
-                attack.draw_bb()
 
     if flower_ == True:
         for flower in flowers:
             flower.draw(frame_time)
-            flower.draw_bb()
         for f_sun in flower_sun:
             if f_sun.show == True:
                 f_sun.draw()
@@ -375,20 +400,16 @@ def draw(frame_time):
     if potato_ == True:
         for potato in potatoes:
             potato.draw(frame_time)
-            potato.draw_bb()
 
     if bomb_ == True:
         for bomb in bombs:
             bomb.draw(frame_time)
-            bomb.draw_bb()
 
     for zombie in enemy:
         zombie.draw(frame_time)
-        zombie.draw_bb()
 
     for sun in sun_list:
         sun.draw()
-        sun.draw_bb()
 
     if back.get_start == False:
         back.gameover()
@@ -421,6 +442,9 @@ def collide(a,b):
     if(bottom_a > top_b):return False
 
     return True
+
+def mouse_collide(a, b):
+    pass
 
 
 

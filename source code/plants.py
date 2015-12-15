@@ -56,6 +56,50 @@ class Plant1:
     def draw_bb(self):
         draw_rectangle(*self.get_bb())
 
+class Plant2:
+    PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
+    RUN_SPEED_KMPH = 3.0                    # Km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.frame = 0
+        self.image = load_image('plant2.png')
+        self.hp = 50
+        self.isTrue = False
+        self.life_time = 0.0
+        self.total_frames = 0.0
+        self.createX = 0
+        self.createY = 0
+
+    def newSet(self, mouse_x, mouse_y):
+        self.createX = int(mouse_x / 100)
+        self.createY = int(mouse_y / 100)
+
+        self.x = self.createX * 100 + 50
+        self.y = self.createY * 100 + 50
+
+    def returnHP(self):
+        if self.hp != 0:
+            return False
+        return True
+
+    def update(self, frame_time):
+        self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
+
+        self.frame = int(self.total_frames + 1) % 8
+
+    def draw(self, frame_time):
+        self.image.clip_draw(self.frame * 100, 0, 100, 100, self.x, self.y)
+
+    def get_bb(self):
+        return self.x-30, self.y-40, self.x+30, self.y+40
+
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
+
 class Flower:
     PIXEL_PER_METER = (10.0 / 0.15)           # 10 pixel 15 cm
     RUN_SPEED_KMPH = 3.0                    # Km / Hour
@@ -86,7 +130,6 @@ class Flower:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames + 1)% 8
-        print("flower: ", self.hp)
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
@@ -112,6 +155,7 @@ class FlowerSun:
         self.frame = 0
         self.total_frames = 0.0
         self.life_time = 0.0
+        self.show_time = 0.0
         self.show = False
 
     def newSet(self, mouse_x, mouse_y):
@@ -128,8 +172,12 @@ class FlowerSun:
         self.frame = int(self.total_frames) % 2
 
         if self.show == True:
+            self.show_time += frame_time
             self.x = self.initX
             self.y = self.initY
+            if self.show_time >= 1.5:
+                self.show_time = 0.0
+                self.show = False
         else:
             self.life_time += frame_time
             if self.life_time >= 5:
@@ -173,7 +221,6 @@ class Potato:
         self.life_time += frame_time
         self.total_frames += FRAMES_PER_ACTION * ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frames + 1)% 4
-        print("Potato: ", self.hp)
 
     def draw(self, frame_time):
         self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y)
